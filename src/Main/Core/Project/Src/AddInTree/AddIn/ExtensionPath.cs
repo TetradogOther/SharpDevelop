@@ -44,12 +44,12 @@ namespace ICSharpCode.Core
 			}
 		}
 
-		public IEnumerable<Codon> Codons {
+		public IList<Codon> Codons {
 			get {
 				return
-					from list in codons
+					(from list in codons
 					from c in list
-					select c;
+					select c).ToArray();
 			}
 		}
 
@@ -58,7 +58,7 @@ namespace ICSharpCode.Core
 		/// i.e. if two addins add the codons to the same path they will be in diffrent group.
 		/// if the same addin adds the codon in diffrent path elements they will be in diffrent groups.
 		/// </summary>
-		public IEnumerable<IEnumerable<Codon>> GroupedCodons {
+		public IEnumerable<IList<Codon>> GroupedCodons {
 			get {
 				return codons.AsReadOnly();
 			}

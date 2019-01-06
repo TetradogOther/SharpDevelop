@@ -30,7 +30,7 @@ namespace ICSharpCode.Core
 	{
 		List<AddInReference> dependencies = new List<AddInReference>();
 		List<AddInReference> conflicts = new List<AddInReference>();
-		Dictionary<string, Version> identities = new Dictionary<string, Version>();
+		SortedList<string, Version> identities = new SortedList<string, Version>();
 		Version primaryVersion;
 		string primaryIdentity;
 		
@@ -46,7 +46,7 @@ namespace ICSharpCode.Core
 			}
 		}
 		
-		public Dictionary<string, Version> Identities {
+		public SortedList<string, Version> Identities {
 			get {
 				return identities;
 			}

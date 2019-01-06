@@ -31,7 +31,7 @@ Imports System.Reflection
 <Assembly: System.Runtime.InteropServices.ComVisible(False)>
 <Assembly: AssemblyCompany("ic#code")>
 <Assembly: AssemblyProduct("SharpDevelop")>
-<Assembly: AssemblyCopyright("2000-2016 AlphaSierraPapa for the SharpDevelop Team")>
+<Assembly: AssemblyCopyright("2000-2019 AlphaSierraPapa for the SharpDevelop Team")>
 <Assembly: AssemblyVersion(RevisionClass.Major + "." + RevisionClass.Minor + "." + RevisionClass.Build + "." + RevisionClass.Revision)>
 <Assembly: AssemblyInformationalVersion(RevisionClass.FullVersion + "-0e58df71")>
 <Assembly: NeutralResourcesLanguage("en-US")>

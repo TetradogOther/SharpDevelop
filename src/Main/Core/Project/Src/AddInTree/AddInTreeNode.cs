@@ -32,7 +32,7 @@ namespace ICSharpCode.Core
 		readonly object lockObj = new object();
 		Dictionary<string, AddInTreeNode> childNodes = new Dictionary<string, AddInTreeNode>();
 		ReadOnlyCollection<Codon> codons;
-		List<IEnumerable<Codon>> codonInput;
+		List<IList<Codon>> codonInput;
 		
 		/// <summary>
 		/// A dictionary containing the child paths.
@@ -43,13 +43,13 @@ namespace ICSharpCode.Core
 			}
 		}
 		
-		public void AddCodons(IEnumerable<Codon> newCodons)
+		public void AddCodons(IList<Codon> newCodons)
 		{
 			if (newCodons == null)
 				throw new ArgumentNullException("newCodons");
 			lock (lockObj) {
 				if (codonInput == null) {
-					codonInput = new List<IEnumerable<Codon>>();
+					codonInput = new List<IList<Codon>>();
 					if (codons != null)
 						codonInput.Add(codons);
 				}

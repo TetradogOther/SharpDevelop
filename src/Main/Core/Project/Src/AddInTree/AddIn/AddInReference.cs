@@ -62,7 +62,7 @@ namespace ICSharpCode.Core
 		}
 		
 		/// <returns>Returns true when the reference is valid.</returns>
-		public bool Check(Dictionary<string, Version> addIns, out Version versionFound)
+		public bool Check(SortedList<string, Version> addIns, out Version versionFound)
 		{
 			if (addIns.TryGetValue(name, out versionFound)) {
 				return CompareVersion(versionFound, minimumVersion) >= 0

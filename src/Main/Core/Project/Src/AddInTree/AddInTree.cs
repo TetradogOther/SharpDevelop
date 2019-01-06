@@ -20,6 +20,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Resources;
@@ -140,17 +141,22 @@ namespace ICSharpCode.Core
 		/// </param>
 		public AddInTreeNode GetTreeNode(string path, bool throwOnNotFound = true)
 		{
-			if (path == null || path.Length == 0) {
-				return rootNode;
-			}
-			string[] splittedPath = path.Split('/');
-			AddInTreeNode curPath = rootNode;
-			for (int i = 0; i < splittedPath.Length; i++) {
-				if (!curPath.ChildNodes.TryGetValue(splittedPath[i], out curPath)) {
-					if (throwOnNotFound)
-						throw new TreePathNotFoundException(path);
-					else
-						return null;
+			
+			string[] splittedPath;
+			AddInTreeNode curPathAnt = rootNode;
+			AddInTreeNode curPath = curPathAnt;
+			if (!string.IsNullOrEmpty(path))
+			{
+				splittedPath = path.Split('/');
+				for (int i = 0; i < splittedPath.Length && curPath != null; i++)
+				{
+					if (!curPathAnt.ChildNodes.TryGetValue(splittedPath[i], out curPath))
+					{
+						if (throwOnNotFound)
+							throw new TreePathNotFoundException(path);
+
+					}
+					curPathAnt = curPath;//para el debug :)
 				}
 			}
 			return curPath;
@@ -216,7 +222,7 @@ namespace ICSharpCode.Core
 		void AddExtensionPath(ExtensionPath path)
 		{
 			AddInTreeNode treePath = CreatePath(rootNode, path.Name);
-			foreach (IEnumerable<Codon> innerCodons in path.GroupedCodons)
+			foreach (IList<Codon> innerCodons in path.GroupedCodons)
 				treePath.AddCodons(innerCodons);
 		}
 		
@@ -279,7 +285,7 @@ namespace ICSharpCode.Core
 		}
 		
 		// used by Load(): disables an addin and removes it from the dictionaries.
-		void DisableAddin(AddIn addIn, Dictionary<string, Version> dict, Dictionary<string, AddIn> addInDict)
+		void DisableAddin(AddIn addIn, SortedList<string, Version> dict, SortedList<string, AddIn> addInDict)
 		{
 			addIn.Enabled = false;
 			addIn.Action = AddInAction.DependencyError;
@@ -288,7 +294,7 @@ namespace ICSharpCode.Core
 				addInDict.Remove(name);
 			}
 		}
-		
+
 		/// <summary>
 		/// Loads a list of .addin files, ensuring that dependencies are satisfied.
 		/// This method is normally called by <see cref="CoreStartup.RunInitialization"/>.
@@ -302,94 +308,151 @@ namespace ICSharpCode.Core
 		public void Load(List<string> addInFiles, List<string> disabledAddIns)
 		{
 			List<AddIn> list = new List<AddIn>();
-			Dictionary<string, Version> dict = new Dictionary<string, Version>();
-			Dictionary<string, AddIn> addInDict = new Dictionary<string, AddIn>();
-			var nameTable = new System.Xml.NameTable();
-			foreach (string fileName in addInFiles) {
-				AddIn addIn;
-				try {
+			SortedList<string, Version> dict = new SortedList<string, Version>();
+			SortedList<string, AddIn> addInDict = new SortedList<string, AddIn>();
+			System.Xml.NameTable nameTable = new System.Xml.NameTable();
+			string fileName;
+			AddIn addIn;
+			IList<string> keys;
+			for (int i = 0; i < addInFiles.Count; i++)
+			{
+				fileName = addInFiles[i];
+				try
+				{
 					addIn = AddIn.Load(this, fileName, nameTable);
-				} catch (AddInLoadException ex) {
+				}
+				catch (AddInLoadException ex)
+				{
 					LoggingService.Error(ex);
-					if (ex.InnerException != null) {
+					if (ex.InnerException != null)
+					{
 						MessageService.ShowError("Error loading AddIn " + fileName + ":\n"
-						                         + ex.InnerException.Message);
-					} else {
+												 + ex.InnerException.Message);
+					}
+					else
+					{
 						MessageService.ShowError("Error loading AddIn " + fileName + ":\n"
-						                         + ex.Message);
+												 + ex.Message);
 					}
 					addIn = new AddIn(this);
 					addIn.addInFileName = fileName;
 					addIn.CustomErrorMessage = ex.Message;
 				}
-				if (addIn.Action == AddInAction.CustomError) {
+				if (addIn.Action == AddInAction.CustomError)
+				{
 					list.Add(addIn);
-					continue;
+
 				}
-				addIn.Enabled = true;
-				if (disabledAddIns != null && disabledAddIns.Count > 0) {
-					foreach (string name in addIn.Manifest.Identities.Keys) {
-						if (disabledAddIns.Contains(name)) {
-							addIn.Enabled = false;
-							break;
+				else
+				{
+					addIn.Enabled = true;
+					if (disabledAddIns != null && disabledAddIns.Count > 0)
+					{
+						keys = addIn.Manifest.Identities.Keys;
+						for (int j = 0; j < keys.Count && addIn.Enabled; j++)
+						{
+							if (disabledAddIns.Contains(keys[j]))
+							{
+								addIn.Enabled = false;
+
+							}
 						}
 					}
-				}
-				if (addIn.Enabled) {
-					foreach (KeyValuePair<string, Version> pair in addIn.Manifest.Identities) {
-						if (dict.ContainsKey(pair.Key)) {
-							MessageService.ShowError("Name '" + pair.Key + "' is used by " +
-							                         "'" + addInDict[pair.Key].FileName + "' and '" + fileName + "'");
-							addIn.Enabled = false;
-							addIn.Action = AddInAction.InstalledTwice;
-							break;
-						} else {
-							dict.Add(pair.Key, pair.Value);
-							addInDict.Add(pair.Key, addIn);
+					if (addIn.Enabled)
+					{
+						foreach (KeyValuePair<string, Version> pair in addIn.Manifest.Identities)
+						{
+							if (dict.ContainsKey(pair.Key))
+							{
+								MessageService.ShowError("Name '" + pair.Key + "' is used by " +
+														 "'" + addInDict[pair.Key].FileName + "' and '" + fileName + "'");
+								addIn.Enabled = false;
+								addIn.Action = AddInAction.InstalledTwice;
+								break;//luego mirar de quitarlo ;)
+							}
+							else
+							{
+								dict.Add(pair.Key, pair.Value);
+								addInDict.Add(pair.Key, addIn);
+							}
 						}
 					}
-				}
-				list.Add(addIn);
-			}
-		checkDependencies:
-			for (int i = 0; i < list.Count; i++) {
-				AddIn addIn = list[i];
-				if (!addIn.Enabled) continue;
-				
-				Version versionFound;
-				
-				foreach (AddInReference reference in addIn.Manifest.Conflicts) {
-					if (reference.Check(dict, out versionFound)) {
-						MessageService.ShowError(addIn.Name + " conflicts with " + reference.ToString()
-						                         + " and has been disabled.");
-						DisableAddin(addIn, dict, addInDict);
-						goto checkDependencies; // after removing one addin, others could break
-					}
-				}
-				foreach (AddInReference reference in addIn.Manifest.Dependencies) {
-					if (!reference.Check(dict, out versionFound)) {
-						if (versionFound != null) {
-							MessageService.ShowError(addIn.Name + " has not been loaded because it requires "
-							                         + reference.ToString() + ", but version "
-							                         + versionFound.ToString() + " is installed.");
-						} else {
-							MessageService.ShowError(addIn.Name + " has not been loaded because it requires "
-							                         + reference.ToString() + ".");
-						}
-						DisableAddin(addIn, dict, addInDict);
-						goto checkDependencies; // after removing one addin, others could break
-					}
+					list.Add(addIn);
 				}
 			}
-			foreach (AddIn addIn in list) {
-				try {
+			//	checkDependencies:
+			CheckDependencies(list, dict, addInDict);//mirar que haga lo mismo que la etiqueta...
+
+			for (int i = 0; i < list.Count; i++)
+			{
+				addIn = list[i];
+				try
+				{
 					InsertAddIn(addIn);
-				} catch (AddInLoadException ex) {
+				}
+				catch (AddInLoadException ex)
+				{
 					LoggingService.Error(ex);
 					MessageService.ShowError("Error loading AddIn " + addIn.FileName + ":\n"
-					                         + ex.Message);
+											 + ex.Message);
 				}
 			}
+		}
+
+		private void CheckDependencies(List<AddIn> list, SortedList<string, Version> dict, SortedList<string, AddIn> addInDict)
+		{
+			Version versionFound;
+			ReadOnlyCollection<AddInReference> references;
+			AddInReference reference;
+			AddIn addIn;
+
+			for (int i = 0; i < list.Count; i++)
+			{
+				addIn = list[i];
+				if (addIn.Enabled)
+				{
+
+
+					references = addIn.Manifest.Conflicts;
+					for (int j = 0; j < references.Count; j++)
+					{
+						reference = references[j];
+						if (reference.Check(dict, out versionFound))
+						{
+							MessageService.ShowError(addIn.Name + " conflicts with " + reference.ToString()
+													 + " and has been disabled.");
+							DisableAddin(addIn, dict, addInDict);
+							//	goto checkDependencies; // after removing one addin, others could break
+							CheckDependencies(list, dict, addInDict);
+						}
+					}
+					references = addIn.Manifest.Dependencies;
+					for (int j = 0; j < references.Count; j++)
+					{
+						reference = references[j];
+
+						if (!reference.Check(dict, out versionFound))
+						{
+							if (versionFound != null)
+							{
+								MessageService.ShowError(addIn.Name + " has not been loaded because it requires "
+														 + reference.ToString() + ", but version "
+														 + versionFound.ToString() + " is installed.");
+							}
+							else
+							{
+								MessageService.ShowError(addIn.Name + " has not been loaded because it requires "
+														 + reference.ToString() + ".");
+							}
+							DisableAddin(addIn, dict, addInDict);
+							//goto checkDependencies; // after removing one addin, others could break
+							CheckDependencies(list, dict, addInDict);
+						}
+					}
+				}
+			}
+
+
 		}
 	}
 }

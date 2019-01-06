@@ -47,11 +47,11 @@ namespace ICSharpCode.Profiler.Controller
 		{
 			memHeader64 = (SharedMemoryHeader64*)fullView.Pointer;
 			#if DEBUG
-						// '~DBG'
-			memHeader32->Magic = 0x7e444247;
+			// '~DBG'
+			memHeader64->Magic = 0x7e444247;
 			#else
-			// '~SM1'
-			memHeader64->Magic = 0x7e534d31;
+						// '~SM1'
+			memHeader32->Magic = 0x7e534d31;
 			#endif
 			memHeader64->TotalLength = profilerOptions.SharedMemorySize;
 			memHeader64->NativeToManagedBufferOffset = Align(sizeof(SharedMemoryHeader64));
@@ -119,14 +119,14 @@ namespace ICSharpCode.Profiler.Controller
 		unsafe void* Malloc64(int bytes)
 		{
 			#if DEBUG
-						const int debuggingInfoSize = 8;
+			const int debuggingInfoSize = 8;
 			bytes += debuggingInfoSize;
 			#endif
 			void* t = TranslatePointer(memHeader64->Allocator.pos);
 			memHeader64->Allocator.pos += bytes;
 			#if DEBUG
-						t = (byte*)t + debuggingInfoSize;
-			((Int32*)t)[-1] = bytes - debuggingInfoSize;
+			t = (byte*)t + debuggingInfoSize;
+			((Int64*)t)[-1] = bytes - debuggingInfoSize;
 			#endif
 			return t;
 		}
