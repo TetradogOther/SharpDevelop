@@ -239,6 +239,9 @@ namespace ICSharpCode.SharpDevelop.Project
 				case "12.00":
 					version = SolutionFormatVersion.VS2012;
 					break;
+				case "15.00":
+					version = SolutionFormatVersion.VS2015;
+					break;
 				default:
 					throw Error("${res:SharpDevelop.Solution.UnknownSolutionVersion}", match.Result("${Version}"));
 			}

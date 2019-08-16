@@ -24,6 +24,7 @@ using System.Text;
 using ICSharpCode.Core;
 using ICSharpCode.SharpDevelop.Project;
 
+//falta añadir cambios que hay en el formato 2015
 namespace ICSharpCode.SharpDevelop.Project
 {
 	sealed class SolutionWriter : IDisposable
@@ -54,20 +55,8 @@ namespace ICSharpCode.SharpDevelop.Project
 		{
 			writer.WriteLine();
 			writer.WriteLine("Microsoft Visual Studio Solution File, Format Version " + (int)version + ".00");
-			switch (version) {
-				case SolutionFormatVersion.VS2005:
-					writer.WriteLine("# Visual Studio 2005");
-					break;
-				case SolutionFormatVersion.VS2008:
-					writer.WriteLine("# Visual Studio 2008");
-					break;
-				case SolutionFormatVersion.VS2010:
-					writer.WriteLine("# Visual Studio 2010");
-					break;
-				case SolutionFormatVersion.VS2012:
-					writer.WriteLine("# Visual Studio 2012");
-					break;
-			}
+			writer.WriteLine("# Visual Studio "+version.ToString().Substring(2));//quito el VS inicial y me quedo con el año
+
 			writer.WriteLine("# SharpDevelop " + RevisionClass.Major + "." + RevisionClass.Minor);
 		}
 		

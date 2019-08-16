@@ -225,7 +225,7 @@ namespace CSharpBinding
 		static readonly CompilerVersion msbuild20 = new CompilerVersion(new Version(2, 0), "C# 2.0");
 		static readonly CompilerVersion msbuild35 = new CompilerVersion(new Version(3, 5), "C# 3.0");
 		static readonly CompilerVersion msbuild40 = new CompilerVersion(new Version(4, 0), DotnetDetection.IsDotnet45Installed() ? "C# 5.0" : "C# 4.0");
-		
+		static readonly CompilerVersion msbuild48 = new CompilerVersion(new Version(4, 8),  "C# 7.3");//por mirar version c# para 4.8
 		public override CompilerVersion CurrentCompilerVersion {
 			get {
 				switch (Project.MinimumSolutionVersion) {
@@ -236,6 +236,8 @@ namespace CSharpBinding
 					case SolutionFormatVersion.VS2010:
 					case SolutionFormatVersion.VS2012:
 						return msbuild40;
+					case SolutionFormatVersion.VS2015:
+						return msbuild48;
 					default:
 						throw new NotSupportedException();
 				}
@@ -249,7 +251,11 @@ namespace CSharpBinding
 				versions.Add(msbuild20);
 				versions.Add(msbuild35);
 			}
+			
 			versions.Add(msbuild40);
+			
+			if(DotnetDetection.IsDotnet48Installed())
+				versions.Add(msbuild48);
 			return versions;
 		}
 		
