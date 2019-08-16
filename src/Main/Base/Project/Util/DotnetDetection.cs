@@ -24,7 +24,7 @@ namespace ICSharpCode.SharpDevelop
 	public static class DotnetDetection
 	{
 		/// <summary>
-		/// Gets whether .NET 3.5 is installed and has at least SP1.  
+		/// Gets whether .NET 3.5 is installed and has at least SP1.
 		/// </summary>
 		public static bool IsDotnet35SP1Installed()
 		{
@@ -35,7 +35,7 @@ namespace ICSharpCode.SharpDevelop
 
 		/// <summary>
 		/// Gets whether any .NET 4.x runtime is installed.
-		/// </summary>		
+		/// </summary>
 		public static bool IsDotnet40Installed()
 		{
 			return true; // required for SD to run
@@ -72,6 +72,35 @@ namespace ICSharpCode.SharpDevelop
 			return GetDotnet4Release() >= 393273;
 		}
 		
+		
+		#region Añadido por mi
+		public static bool IsDotnet461Installed()
+		{
+			
+			return GetDotnet4Release() >= 394254;
+		}
+		public static bool IsDotnet462Installed()
+		{
+			
+			return GetDotnet4Release() >= 394806;
+		}
+		public static bool IsDotnet47Installed()
+		{
+			return GetDotnet4Release()>=460798;
+		}
+		public static bool IsDotnet471Installed()
+		{
+			return GetDotnet4Release()>=461308;
+		}
+		public static bool IsDotnet472Installed()
+		{
+			return GetDotnet4Release()>=461808;
+		}
+		public static bool IsDotnet48Installed()
+		{
+			return GetDotnet4Release()>=528040;
+		}
+		#endregion
 		/// <summary>
 		/// Gets the .NET 4.x release number.
 		/// The numbers are documented on http://msdn.microsoft.com/en-us/library/hh925568.aspx
@@ -92,6 +121,17 @@ namespace ICSharpCode.SharpDevelop
 		{
 			// HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\DevDiv\BuildTools\Servicing\12.0
 			using (var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\DevDiv\BuildTools\Servicing\12.0\MSBuild")) {
+				return key != null && key.GetValue("Install") as int? >= 1;
+			}
+		}
+		//por mirar
+				/// <summary>
+		/// Gets whether the Microsoft Build Tools 2013 (MSBuild 15.0) is installed.
+		/// </summary>
+		public static bool IsBuildTools2015Installed()
+		{
+			// HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\DevDiv\BuildTools\Servicing\15.0
+			using (var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\DevDiv\BuildTools\Servicing\15.0\MSBuild")) {
 				return key != null && key.GetValue("Install") as int? >= 1;
 			}
 		}

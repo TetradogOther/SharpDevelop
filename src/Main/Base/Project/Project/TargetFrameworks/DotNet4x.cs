@@ -97,10 +97,14 @@ namespace ICSharpCode.SharpDevelop.Project
 		
 		public override SolutionFormatVersion MinimumSolutionVersion {
 			get {
+				SolutionFormatVersion solutionFormatVersion;
 				if (this.Version <= Versions.V4_0)
-					return SolutionFormatVersion.VS2010;
-				else
-					return SolutionFormatVersion.VS2012;
+					solutionFormatVersion= SolutionFormatVersion.VS2010;
+				else if(this.Version<= Versions.V4_5_1)//falta afinar
+					solutionFormatVersion= SolutionFormatVersion.VS2012;
+				else solutionFormatVersion=SolutionFormatVersion.VS2015;
+				
+				return solutionFormatVersion;
 			}
 		}
 	}

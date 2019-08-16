@@ -17,27 +17,11 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Reflection;
 
-namespace ICSharpCode.SharpDevelop
-{
-	/// <summary>
-	/// Commonly used version constants.
-	/// </summary>
-	static class Versions
-	{
-		public static readonly Version V2_0 = new Version(2, 0);
-		public static readonly Version V3_0 = new Version(3, 0);
-		public static readonly Version V3_5 = new Version(3, 5);
-		public static readonly Version V4_0 = new Version(4, 0);
-		public static readonly Version V4_5 = new Version(4, 5);
-		public static readonly Version V4_5_1 = new Version(4, 5, 1);
-		public static readonly Version V4_5_2 = new Version(4, 5, 2);
-		public static readonly Version V4_6 = new Version(4, 6);
-		public static readonly Version V4_6_1 = new Version(4, 6,1);
-		public static readonly Version V4_6_2 = new Version(4, 6, 2);
-		public static readonly Version V4_7 = new Version(4, 7);
-		public static readonly Version V4_7_1 = new Version(4, 7, 1);
-		public static readonly Version V4_7_2 = new Version(4, 7, 2);
-		public static readonly Version V4_8 = new Version(4, 8);
-	}
-}
+[assembly: AssemblyTitle("SharpDevelop Build Worker for MSBuild 12.0")]
+[assembly: AssemblyDescription("Runs MSBuild 12.0")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+[assembly: CLSCompliant(true)]

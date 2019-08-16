@@ -158,6 +158,8 @@ namespace ICSharpCode.SharpDevelop.Project
 					case SolutionFormatVersion.VS2010:
 					case SolutionFormatVersion.VS2012:
 						return CompilerVersion.MSBuild40;
+					case SolutionFormatVersion.VS2015:
+						return CompilerVersion.MSBuild150;
 					default:
 						throw new NotSupportedException();
 				}

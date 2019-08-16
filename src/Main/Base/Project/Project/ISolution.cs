@@ -28,7 +28,8 @@ namespace ICSharpCode.SharpDevelop.Project
 		VS2005 = 9,
 		VS2008 = 10,
 		VS2010 = 11,
-		VS2012 = 12
+		VS2012 = 12,
+		VS2015 = 15,
 	}
 	
 	/// <summary>

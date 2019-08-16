@@ -221,7 +221,7 @@ namespace CSharpBinding
 			else
 				return base.GetDefaultItemType(fileName);
 		}
-		
+		//me falta añadir esta parte
 		static readonly CompilerVersion msbuild20 = new CompilerVersion(new Version(2, 0), "C# 2.0");
 		static readonly CompilerVersion msbuild35 = new CompilerVersion(new Version(3, 5), "C# 3.0");
 		static readonly CompilerVersion msbuild40 = new CompilerVersion(new Version(4, 0), DotnetDetection.IsDotnet45Installed() ? "C# 5.0" : "C# 4.0");

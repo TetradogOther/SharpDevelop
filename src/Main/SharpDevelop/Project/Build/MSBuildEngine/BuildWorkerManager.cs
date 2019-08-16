@@ -34,6 +34,8 @@ namespace ICSharpCode.SharpDevelop.Project
 		readonly List<BuildWorker> freeWorkers = new List<BuildWorker>();
 		readonly string workerProcessName;
 		
+		public static readonly BuildWorkerManager MSBuild150 = new BuildWorkerManager("ICSharpCode.SharpDevelop.BuildWorker150.exe");//este lo tendré que hacer...
+		
 		public static readonly BuildWorkerManager MSBuild120 = new BuildWorkerManager("ICSharpCode.SharpDevelop.BuildWorker120.exe");
 		public static readonly BuildWorkerManager MSBuild40 = new BuildWorkerManager("ICSharpCode.SharpDevelop.BuildWorker40.exe");
 		public static readonly BuildWorkerManager MSBuild35 = new BuildWorkerManager("ICSharpCode.SharpDevelop.BuildWorker35.exe");

@@ -81,6 +81,7 @@ namespace ICSharpCode.SharpDevelop.Project
 		
 		internal Task<bool> RunBuildAsync(CancellationToken cancellationToken)
 		{
+			BuildWorkerManager buildWorkerManager;
 			Dictionary<string, string> globalProperties = new Dictionary<string, string>();
 			globalProperties.AddRange(SD.MSBuildEngine.GlobalBuildProperties);
 			
@@ -143,29 +144,38 @@ namespace ICSharpCode.SharpDevelop.Project
 				// just some TaskStarted & TaskFinished events should be reported
 				job.InterestingTaskNames.AddRange(InterestingTasks);
 			}
-			foreach (var pair in globalProperties) {
-				job.Properties.Add(pair.Key, pair.Value);
+			for (int i = 0, globalPropertiesCount = globalProperties.Count; i < globalPropertiesCount; i++) {
+				var pair = globalProperties[i];
+				job.Properties.Add(pair.Key, pair.Value); 
 			}
 			
-			foreach (ILogger logger in loggers) {
+			for (int i = 0, loggersCount = loggers.Count; i < loggersCount; i++) {
+				ILogger logger = loggers[i];
 				logger.Initialize(eventSource);
 			}
 			
 			tcs = new TaskCompletionSource<bool>();
 			if (projectMinimumSolutionVersion <= SolutionFormatVersion.VS2008) {
 				if (DotnetDetection.IsDotnet35SP1Installed()) {
-					BuildWorkerManager.MSBuild35.RunBuildJob(job, loggerChain, OnDone, cancellationToken);
+					buildWorkerManager=BuildWorkerManager.MSBuild35;
 				} else {
 					loggerChain.HandleError(new BuildError(job.ProjectFileName, ".NET 3.5 SP1 is required to build this project."));
 					tcs.SetResult(false);
 				}
 			} else {
-				if (DotnetDetection.IsBuildTools2013Installed()) {
-					BuildWorkerManager.MSBuild120.RunBuildJob(job, loggerChain, OnDone, cancellationToken);
+				if(DotnetDetection.IsBuildTools2015Installed()){//añadido por mi :D
+					
+					buildWorkerManager=BuildWorkerManager.MSBuild150;
+				}
+				
+				else if (DotnetDetection.IsBuildTools2013Installed()) {
+					buildWorkerManager=BuildWorkerManager.MSBuild120;
+					
 				} else {
-					BuildWorkerManager.MSBuild40.RunBuildJob(job, loggerChain, OnDone, cancellationToken);
+					buildWorkerManager=BuildWorkerManager.MSBuild40;
 				}
 			}
+			buildWorkerManager.RunBuildJob(job, loggerChain, OnDone, cancellationToken);
 			return tcs.Task;
 		}
 		
